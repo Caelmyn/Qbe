@@ -42,6 +42,13 @@ public class BlockTypeSelectorText : MonoBehaviour
 		transform.parent.gameObject.SetActive(false);
 	}
 
+	public void DeleteSelectedBlock()
+	{
+		Destroy(_selected);
+		_selected = null;
+		transform.parent.gameObject.SetActive(false);
+	}
+
 	public void Previous()
 	{
 		--_index;
