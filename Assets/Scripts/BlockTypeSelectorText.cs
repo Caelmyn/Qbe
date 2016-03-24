@@ -4,16 +4,21 @@ using System.Collections;
 
 public class BlockTypeSelectorText : MonoBehaviour
 {
+	[SerializeField] private GameObject _map;
 	[SerializeField] private string[] _texts;
+	[SerializeField] private GameObject[] _blockReferences;
 
 	private int _index = 0;
 	private Text _text;
 	private GameObject _selected;
+	private Vector3 _selectedGridPosition;
 
 	void Start()
 	{
 		if (_texts.Length == 0)
-			throw new UnityEngine.PlayerPrefsException("No texts are given here");
+			throw new UnityEngine.MissingReferenceException("No texts are given here");
+		if (_blockReferences.Length == 0)
+			throw new UnityEngine.MissingReferenceException("No objects references are given here");
 		_text = GetComponent<Text>() as Text;
 		if (_text == null)
 			throw new UnityEngine.MissingComponentException("Missing Text component");
@@ -34,11 +39,13 @@ public class BlockTypeSelectorText : MonoBehaviour
 		}
 		else
 			_text.text = _texts[blockScript.BlockType];
+		_selectedGridPosition = new Vector3(Mathf.FloorToInt(_selected.transform.position.x), Mathf.CeilToInt(_selected.transform.position.y), Mathf.FloorToInt(_selected.transform.position.z));
 	}
 
 	public void Unselect()
 	{
 		_selected = null;
+		_selectedGridPosition = Vector3.zero;
 		transform.parent.gameObject.SetActive(false);
 	}
 
@@ -46,6 +53,7 @@ public class BlockTypeSelectorText : MonoBehaviour
 	{
 		Destroy(_selected);
 		_selected = null;
+		_selectedGridPosition = Vector3.zero;
 		transform.parent.gameObject.SetActive(false);
 	}
 
@@ -55,6 +63,7 @@ public class BlockTypeSelectorText : MonoBehaviour
 		if (_index < 0)
 			_index = _texts.Length - 1;
 		_text.text = _texts[_index];
+		ChangeBlock();
 	}
 
 	public void Next()
@@ -63,5 +72,14 @@ public class BlockTypeSelectorText : MonoBehaviour
 		if (_index == _texts.Length)
 			_index = 0;
 		_text.text = _texts[_index];
+		ChangeBlock();
+	}
+
+	void ChangeBlock()
+	{
+		Destroy(_selected);
+		_selected = Instantiate(_blockReferences[_index]) as GameObject;
+		_selected.transform.Translate(_selectedGridPosition);
+		_selected.transform.parent = _map.transform;
 	}
 }
