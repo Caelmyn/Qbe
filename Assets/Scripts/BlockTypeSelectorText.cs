@@ -80,6 +80,6 @@ public class BlockTypeSelectorText : MonoBehaviour
 		Destroy(_selected);
 		_selected = Instantiate(_blockReferences[_index]) as GameObject;
 		_selected.transform.Translate(_selectedGridPosition);
-		_selected.transform.parent = _map.transform;
+		_selected.transform.SetParent(_map.transform);
 	}
 }
